@@ -18,6 +18,12 @@ enum AnchorOrientation {
   bottomRight,
 }
 
+enum EdgeCurveType {
+  straight,
+  normalCurve,
+  sameNode,
+}
+
 enum AnchorMargin { none, start, end }
 
 enum MatrixOrientation {
@@ -25,11 +31,9 @@ enum MatrixOrientation {
   Vertical,
 }
 
-List<NodeInput> nodeInputFromJson(String str) =>
-    List<NodeInput>.from(json.decode(str).map((x) => NodeInput.fromJson(x)));
+List<NodeInput> nodeInputFromJson(String str) => List<NodeInput>.from(json.decode(str).map((x) => NodeInput.fromJson(x)));
 
-String nodeInputToJson(List<NodeInput> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String nodeInputToJson(List<NodeInput> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 enum EdgeArrowType { none, one, both }
 
@@ -55,10 +59,8 @@ class EdgeInput {
   final EdgeArrowType type;
 
   factory EdgeInput.fromJson(Map<String, dynamic> json) => EdgeInput(
-        outcome: json["outcome"] == null ? null : json["outcome"],
-        type: json["type"] == null
-            ? EdgeArrowType.one
-            : EdgeInput.typeFromString(json["type"]),
+        outcome: json["outcome"],
+        type: json["type"] == null ? EdgeArrowType.one : EdgeInput.typeFromString(json["type"]),
       );
 
   static EdgeArrowType typeFromString(String typeAsString) {
@@ -138,15 +140,14 @@ class NodeInput {
   }
 
   factory NodeInput.fromJson(Map<String, dynamic> json) => NodeInput(
-      id: json["id"] == null ? null : json["id"],
-      next:
-          List<EdgeInput>.from(json["next"].map((x) => EdgeInput.fromJson(x))),
+      id: json["id"],
+      next: List<EdgeInput>.from(json["next"].map((x) => EdgeInput.fromJson(x))),
       size: json["size"] == null ? null : NodeSize.fromJson(json["size"]));
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "next": List<dynamic>.from(next.map((x) => x.toJson())),
-        "size": size == null ? null : size!.toJson(),
+        "size": size?.toJson(),
       };
 }
 
@@ -161,34 +162,20 @@ class MatrixNode extends NodeOutput {
   MatrixNode({
     required this.x,
     required this.y,
-    required String id,
-    required List<EdgeInput> next,
-    NodeSize? size,
-    AnchorType? anchorType,
-    String? from,
-    String? to,
-    AnchorOrientation? orientation,
-    bool isAnchor = false,
-    AnchorMargin? anchorMargin,
-    List<String> passedIncomes = const [],
-    List<String> renderIncomes = const [],
-    int? childrenOnMatrix,
-  }) : super(
-          id: id,
-          next: next,
-          size: size,
-          anchorType: anchorType,
-          from: from,
-          to: to,
-          orientation: orientation,
-          isAnchor: isAnchor,
-          anchorMargin: anchorMargin,
-          passedIncomes: passedIncomes,
-          renderIncomes: renderIncomes,
-          childrenOnMatrix: childrenOnMatrix,
-        );
-  static MatrixNode fromNodeOutput(
-      {required int x, required int y, required NodeOutput nodeOutput}) {
+    required super.id,
+    required super.next,
+    super.size,
+    super.anchorType,
+    super.from,
+    super.to,
+    super.orientation,
+    super.isAnchor,
+    super.anchorMargin,
+    super.passedIncomes,
+    super.renderIncomes,
+    super.childrenOnMatrix,
+  });
+  static MatrixNode fromNodeOutput({required int x, required int y, required NodeOutput nodeOutput}) {
     return MatrixNode(
       x: x,
       y: y,
@@ -220,9 +207,9 @@ class MatrixNode extends NodeOutput {
 
 class NodeOutput extends NodeInput {
   NodeOutput({
-    required String id,
-    required List<EdgeInput> next,
-    NodeSize? size,
+    required super.id,
+    required super.next,
+    super.size,
     this.anchorType,
     this.from,
     this.to,
@@ -232,7 +219,7 @@ class NodeOutput extends NodeInput {
     this.renderIncomes = const [],
     this.childrenOnMatrix,
     this.anchorMargin,
-  }) : super(id: id, next: next, size: size);
+  });
 
   Map<AnchorMargin, NodeOutput> anchors = {};
   NodeOutput? node;
@@ -270,6 +257,8 @@ class Edge {
   final MatrixNode from;
   final MatrixNode to;
   final EdgeArrowType arrowType;
+  final EdgeCurveType curve;
+  final int sameNodePos;
 
-  Edge(this.points, this.from, this.to, this.arrowType);
+  Edge(this.points, this.from, this.to, this.arrowType, {this.curve = EdgeCurveType.straight, this.sameNodePos = 0});
 }

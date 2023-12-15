@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graphite/core/typings.dart';
 import 'package:graphite/graphite.dart';
 import 'dart:math';
 
@@ -6,10 +7,7 @@ List<NodeInput> flowChart = [
   NodeInput(id: "start", next: [EdgeInput(outcome: "process")]),
   NodeInput(id: "documents", next: [EdgeInput(outcome: "process")]),
   NodeInput(id: "process", next: [EdgeInput(outcome: "decision")]),
-  NodeInput(
-      id: "decision",
-      size: const NodeSize(width: 100, height: 100),
-      next: [EdgeInput(outcome: "processA"), EdgeInput(outcome: "processB")]),
+  NodeInput(id: "decision", size: const NodeSize(width: 100, height: 100), next: [EdgeInput(outcome: "processA"), EdgeInput(outcome: "processB")]),
   NodeInput(id: "processA", next: [EdgeInput(outcome: "end")]),
   NodeInput(id: "processB", next: [EdgeInput(outcome: "end")]),
   NodeInput(id: "end", next: []),
@@ -64,9 +62,7 @@ class FlowchartPageState extends State<FlowchartPage> {
     final list = flowChart;
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-          leading: const Icon(Icons.view_module),
-          title: const Text('Flowchart Example')),
+      appBar: AppBar(leading: const Icon(Icons.view_module), title: const Text('Flowchart Example')),
       body: InteractiveViewer(
         minScale: 0.5,
         maxScale: 3,
@@ -75,18 +71,16 @@ class FlowchartPageState extends State<FlowchartPage> {
           constraints: BoxConstraints(minWidth: screenSize.width),
           child: Center(
             child: DirectGraph(
-                  list: list,
-                  defaultCellSize: const Size(250.0, 100.0),
-                  cellPadding:
-                      const EdgeInsets.symmetric(vertical: 30, horizontal: 5),
-                  contactEdgesDistance: 0,
-                  orientation: MatrixOrientation.Vertical,
-                  nodeBuilder: (BuildContext context, NodeInput node) => Padding(
-                      padding: const EdgeInsets.all(5), child: _buildNode(node)),
-                  centered: true,
-                  minScale: .1,
-                  maxScale: 1,
-                ),
+              list: list,
+              defaultCellSize: const Size(250.0, 100.0),
+              cellPadding: const EdgeInsets.symmetric(vertical: 30, horizontal: 5),
+              contactEdgesDistance: 0,
+              orientation: MatrixOrientation.Vertical,
+              nodeBuilder: (BuildContext context, NodeInput node) => Padding(padding: const EdgeInsets.all(5), child: _buildNode(node)),
+              centered: true,
+              minScale: .1,
+              maxScale: 1,
+            ),
           ),
         ),
       ),

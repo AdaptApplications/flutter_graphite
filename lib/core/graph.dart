@@ -1,11 +1,10 @@
-import 'package:graphite/core/graph_matrix.dart';
-import 'package:graphite/core/matrix.dart';
-import 'package:graphite/core/traverse_queue.dart';
-import 'package:graphite/core/typings.dart';
+import 'graph_matrix.dart';
+import 'matrix.dart';
+import 'traverse_queue.dart';
+import 'typings.dart';
 
 class Graph extends GraphMatrix {
-  Graph({required List<NodeInput> list, required bool centred})
-      : super(list: list, centred: centred);
+  Graph({required super.list, required super.centred});
 
   void handleSplitNode(NodeOutput item, State state, TraverseQueue levelQueue) {
     bool isInserted = processOrSkipNodeOnMatrix(item, state);
@@ -14,8 +13,7 @@ class Graph extends GraphMatrix {
     }
   }
 
-  void handleSplitJoinNode(
-      NodeOutput item, State state, TraverseQueue levelQueue) {
+  void handleSplitJoinNode(NodeOutput item, State state, TraverseQueue levelQueue) {
     var queue = state.queue, mtx = state.mtx;
     if (joinHasUnresolvedIncomes(item)) {
       queue.push(item);
@@ -44,15 +42,11 @@ class Graph extends GraphMatrix {
     }
   }
 
-  void handleSimpleNode(
-      NodeOutput item, State state, TraverseQueue levelQueue) {
+  void handleSimpleNode(NodeOutput item, State state, TraverseQueue levelQueue) {
     var queue = state.queue;
     bool isInserted = processOrSkipNodeOnMatrix(item, state);
     if (isInserted) {
-      queue.add(
-          incomeId: item.id,
-          bufferQueue: levelQueue,
-          items: getOutcomesArray(item.id));
+      queue.add(incomeId: item.id, bufferQueue: levelQueue, items: getOutcomesArray(item.id));
     }
   }
 
@@ -106,7 +100,7 @@ class Graph extends GraphMatrix {
   Matrix traverse() {
     var roots = this.roots();
     State state = State(mtx: Matrix(), queue: TraverseQueue(), x: 0, y: 0);
-    if (roots.length == 0) {
+    if (roots.isEmpty) {
       throw "no graph roots found";
     }
     var mtx = state.mtx, queue = state.queue;

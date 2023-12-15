@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graphite/core/typings.dart';
 import 'package:graphite/graphite.dart';
 
 const presetComplex = '['
@@ -37,8 +38,7 @@ class CustomEdgesPageState extends State<CustomEdgesPage> {
   Map<String, bool> selected = {};
   void _onItemSelected(String nodeId) {
     setState(() {
-      selected[nodeId] =
-          selected[nodeId] == null || !selected[nodeId]! ? true : false;
+      selected[nodeId] = selected[nodeId] == null || !selected[nodeId]! ? true : false;
     });
   }
 
@@ -46,9 +46,7 @@ class CustomEdgesPageState extends State<CustomEdgesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-          leading: const Icon(Icons.view_comfy),
-          title: const Text('Custom Edges Example')),
+      appBar: AppBar(leading: const Icon(Icons.view_comfy), title: const Text('Custom Edges Example')),
       body: InteractiveViewer(
         constrained: false,
         child: DirectGraph(
@@ -68,10 +66,7 @@ class CustomEdgesPageState extends State<CustomEdgesPage> {
                 child: Text(
                   node.id,
                   style: selected[node.id] ?? false
-                      ? const TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red)
+                      ? const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.red)
                       : const TextStyle(fontSize: 20.0),
                 ),
               ),
@@ -84,8 +79,7 @@ class CustomEdgesPageState extends State<CustomEdgesPage> {
               ..strokeCap = StrokeCap.round
               ..strokeJoin = StrokeJoin.round
               ..strokeWidth = 2;
-            if ((selected[edge.from.id] ?? false) &&
-                (selected[edge.to.id] ?? false)) {
+            if ((selected[edge.from.id] ?? false) && (selected[edge.to.id] ?? false)) {
               p.color = Colors.red;
             }
             return p;
@@ -100,8 +94,7 @@ class CustomEdgesPageState extends State<CustomEdgesPage> {
   }
 }
 
-Path customEdgePathBuilder(NodeInput from, NodeInput to,
-    List<List<double>> points, EdgeArrowType arrowType) {
+Path customEdgePathBuilder(NodeInput from, NodeInput to, List<List<double>> points, EdgeArrowType arrowType) {
   var path = Path();
   path.moveTo(points[0][0], points[0][1]);
   points.sublist(1).forEach((p) {

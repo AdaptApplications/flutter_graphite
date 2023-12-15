@@ -3,14 +3,12 @@ library graphite;
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
-import 'package:graphite/core/graph.dart';
-import 'package:graphite/core/matrix.dart';
-import 'package:graphite/core/typings.dart';
-import 'package:graphite/graphite_root.dart';
-import 'package:graphite/graphite_typings.dart';
 
-export 'package:graphite/graphite_typings.dart';
-export 'package:graphite/core/typings.dart';
+import 'core/graph.dart';
+import 'core/matrix.dart';
+import 'core/typings.dart';
+import 'graphite_root.dart';
+import 'graphite_typings.dart';
 
 class DirectGraph extends StatefulWidget {
   /// Graph source defined as [list] of [NodeInput]'s. Root or entry point for
@@ -235,7 +233,7 @@ class DirectGraph extends StatefulWidget {
   /// [onNodePanStart],[onNodePanUpdate],[onNodePanDown],
   /// [onNodeSecondaryTapDown],[onNodeSecondaryTapUp] gesture events for nodes.
   /// See [GestureDetector] for details.
-  DirectGraph({
+  const DirectGraph({
     super.key,
     required this.list,
     required this.defaultCellSize,
@@ -338,7 +336,7 @@ class _DirectGraphState extends State<DirectGraph> {
 
   @override
   Widget build(BuildContext context) {
-    var graph = this.toGraph(widget.list, widget.centered);
+    var graph = toGraph(widget.list, widget.centered);
     var mtx = graph.traverse();
     if (widget.orientation == MatrixOrientation.Vertical) {
       mtx = mtx.rotate();

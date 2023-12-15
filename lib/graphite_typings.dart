@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:graphite/core/typings.dart';
+
+import 'core/typings.dart';
 
 typedef NodeCellBuilder = Widget Function(BuildContext context, NodeInput node);
 
@@ -9,11 +10,9 @@ typedef OverlayBuilder = List<Widget> Function(
   List<Edge> edges,
 );
 
-typedef EdgeLabelBuilder = Widget Function(
-    BuildContext context, Edge edge, bool isVertical);
+typedef EdgeLabelBuilder = Widget Function(BuildContext context, Edge edge, bool isVertical);
 
-typedef ContentWrapperBuilder = Widget Function(
-    BuildContext context, Size size, Widget child);
+typedef ContentWrapperBuilder = Widget Function(BuildContext context, Size size, Widget child);
 
 enum EdgeLabelTextAlignment {
   before,
@@ -48,60 +47,34 @@ class EdgeLabels {
   });
 }
 
-typedef GestureNodeTapDownCallback = void Function(
-    TapDownDetails details, MatrixNode node, Rect rect);
-typedef GestureNodeTapUpCallback = void Function(
-    TapUpDetails details, MatrixNode node, Rect rect);
+typedef GestureNodeTapDownCallback = void Function(TapDownDetails details, MatrixNode node, Rect rect);
+typedef GestureNodeTapUpCallback = void Function(TapUpDetails details, MatrixNode node, Rect rect);
 
-typedef GestureNodeLongPressStartCallback = void Function(
-    LongPressStartDetails details, MatrixNode node, Rect rect);
-typedef GestureNodeLongPressEndCallback = void Function(
-    LongPressEndDetails details, MatrixNode node, Rect rect);
-typedef GestureNodeLongPressMoveUpdateCallback = void Function(
-    LongPressMoveUpdateDetails details, MatrixNode node, Rect rect);
-typedef GestureNodeForcePressStartCallback = void Function(
-    ForcePressDetails details, MatrixNode node, Rect rect);
-typedef GestureNodeForcePressEndCallback = void Function(
-    ForcePressDetails details, MatrixNode node, Rect rect);
-typedef GestureNodeForcePressPeakCallback = void Function(
-    ForcePressDetails details, MatrixNode node, Rect rect);
-typedef GestureNodeForcePressUpdateCallback = void Function(
-    ForcePressDetails details, MatrixNode node, Rect rect);
-typedef GestureNodePanStartCallback = void Function(
-    DragStartDetails details, MatrixNode node, Rect rect);
-typedef GestureNodePanUpdateCallback = void Function(
-    DragUpdateDetails details, MatrixNode node, Rect rect);
-typedef GestureNodePanDownCallback = void Function(
-    DragDownDetails details, MatrixNode node, Rect rect);
+typedef GestureNodeLongPressStartCallback = void Function(LongPressStartDetails details, MatrixNode node, Rect rect);
+typedef GestureNodeLongPressEndCallback = void Function(LongPressEndDetails details, MatrixNode node, Rect rect);
+typedef GestureNodeLongPressMoveUpdateCallback = void Function(LongPressMoveUpdateDetails details, MatrixNode node, Rect rect);
+typedef GestureNodeForcePressStartCallback = void Function(ForcePressDetails details, MatrixNode node, Rect rect);
+typedef GestureNodeForcePressEndCallback = void Function(ForcePressDetails details, MatrixNode node, Rect rect);
+typedef GestureNodeForcePressPeakCallback = void Function(ForcePressDetails details, MatrixNode node, Rect rect);
+typedef GestureNodeForcePressUpdateCallback = void Function(ForcePressDetails details, MatrixNode node, Rect rect);
+typedef GestureNodePanStartCallback = void Function(DragStartDetails details, MatrixNode node, Rect rect);
+typedef GestureNodePanUpdateCallback = void Function(DragUpdateDetails details, MatrixNode node, Rect rect);
+typedef GestureNodePanDownCallback = void Function(DragDownDetails details, MatrixNode node, Rect rect);
 
-typedef GestureBackgroundTapCallback = void Function(
-    TapDownDetails details);
+typedef GestureBackgroundTapCallback = void Function(TapDownDetails details);
 typedef EdgePaintBuilder = Paint Function(Edge edge);
-typedef GestureEdgeTapDownCallback = void Function(
-    TapDownDetails details, Edge edge);
-typedef GestureEdgeTapUpCallback = void Function(
-    TapUpDetails details, Edge edge);
+typedef GestureEdgeTapDownCallback = void Function(TapDownDetails details, Edge edge);
+typedef GestureEdgeTapUpCallback = void Function(TapUpDetails details, Edge edge);
 
-typedef GestureEdgeLongPressStartCallback = void Function(
-    LongPressStartDetails details, Edge edge);
-typedef GestureEdgeLongPressEndCallback = void Function(
-    LongPressEndDetails details, Edge edge);
-typedef GestureEdgeLongPressMoveUpdateCallback = void Function(
-    LongPressMoveUpdateDetails details, Edge edge);
-typedef GestureEdgeForcePressStartCallback = void Function(
-    ForcePressDetails details, Edge edge);
-typedef GestureEdgeForcePressEndCallback = void Function(
-    ForcePressDetails details, Edge edge);
-typedef GestureEdgeForcePressPeakCallback = void Function(
-    ForcePressDetails details, Edge edge);
-typedef GestureEdgeForcePressUpdateCallback = void Function(
-    ForcePressDetails details, Edge edge);
-typedef GestureEdgeDragStartCallback = void Function(
-    DragStartDetails details, Edge edge);
-typedef GestureEdgeDragUpdateCallback = void Function(
-    DragUpdateDetails details, Edge edge);
-typedef GestureEdgeDragDownCallback = void Function(
-    DragDownDetails details, Edge edge);
+typedef GestureEdgeLongPressStartCallback = void Function(LongPressStartDetails details, Edge edge);
+typedef GestureEdgeLongPressEndCallback = void Function(LongPressEndDetails details, Edge edge);
+typedef GestureEdgeLongPressMoveUpdateCallback = void Function(LongPressMoveUpdateDetails details, Edge edge);
+typedef GestureEdgeForcePressStartCallback = void Function(ForcePressDetails details, Edge edge);
+typedef GestureEdgeForcePressEndCallback = void Function(ForcePressDetails details, Edge edge);
+typedef GestureEdgeForcePressPeakCallback = void Function(ForcePressDetails details, Edge edge);
+typedef GestureEdgeForcePressUpdateCallback = void Function(ForcePressDetails details, Edge edge);
+typedef GestureEdgeDragStartCallback = void Function(DragStartDetails details, Edge edge);
+typedef GestureEdgeDragUpdateCallback = void Function(DragUpdateDetails details, Edge edge);
+typedef GestureEdgeDragDownCallback = void Function(DragDownDetails details, Edge edge);
 
-typedef EdgePathBuilder = Path Function(NodeInput income, NodeInput node,
-    List<List<double>> points, EdgeArrowType arrowType);
+typedef EdgePathBuilder = Path Function(NodeInput income, NodeInput node, List<List<double>> points, EdgeArrowType arrowType);

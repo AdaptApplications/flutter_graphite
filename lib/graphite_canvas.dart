@@ -2,13 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:graphite/core/matrix.dart';
-import 'package:graphite/core/typings.dart';
-import 'package:graphite/graphite_cell.dart';
-import 'package:graphite/graphite_edges_painter.dart';
-import 'package:graphite/graphite_typings.dart';
-import 'package:graphite/utils.dart';
 import 'package:touchable/touchable.dart';
+
+import 'core/matrix.dart';
+import 'core/typings.dart';
+import 'graphite_cell.dart';
+import 'graphite_edges_painter.dart';
+import 'graphite_typings.dart';
+import 'utils.dart';
 
 class GraphiteCanvas extends StatefulWidget {
   final Size defaultCellSize;
@@ -71,7 +72,7 @@ class GraphiteCanvas extends StatefulWidget {
   final GestureEdgeTapUpCallback? onEdgeSecondaryTapUp;
 
   const GraphiteCanvas({
-    Key? key,
+    super.key,
     required this.defaultCellSize,
     required this.matrix,
     required this.cellPadding,
@@ -113,15 +114,14 @@ class GraphiteCanvas extends StatefulWidget {
     this.onNodeSecondaryTapDown,
     this.onNodeSecondaryTapUp,
     this.builder,
-  }) : super(key: key);
+  });
 
   @override
   _GraphiteCanvasState createState() => _GraphiteCanvasState();
 }
 
 class _GraphiteCanvasState extends State<GraphiteCanvas> {
-  final StreamController<Gesture> touchController =
-      StreamController.broadcast();
+  final StreamController<Gesture> touchController = StreamController.broadcast();
   StreamSubscription? streamSubscription;
 
   @override
@@ -135,23 +135,19 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
   }
 
   double _getWidthOfCanvas() {
-    return getWidthOfCanvas(
-        widget.matrix, widget.defaultCellSize.width, widget.cellPadding);
+    return getWidthOfCanvas(widget.matrix, widget.defaultCellSize.width, widget.cellPadding);
   }
 
   double _getHeightOfCanvas() {
-    return getHeightOfCanvas(
-        widget.matrix, widget.defaultCellSize.height, widget.cellPadding);
+    return getHeightOfCanvas(widget.matrix, widget.defaultCellSize.height, widget.cellPadding);
   }
 
   double _getHighestHeightInARow(int y) {
-    return getHighestHeightInARow(
-        widget.matrix, widget.defaultCellSize.height, y);
+    return getHighestHeightInARow(widget.matrix, widget.defaultCellSize.height, y);
   }
 
   double _getWidestWidthInAColumn(int x) {
-    return getWidestWidthInAColumn(
-        widget.matrix, widget.defaultCellSize.width, x);
+    return getWidestWidthInAColumn(widget.matrix, widget.defaultCellSize.width, x);
   }
 
   // exclusive
@@ -183,12 +179,8 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
     final h = _getHighestHeightInARow(node.y);
     final cellWidth = node.size?.width ?? widget.defaultCellSize.width;
     final cellHeight = node.size?.height ?? widget.defaultCellSize.height;
-    final cellHorizontalPadding = (cellWidth != w
-        ? widget.cellPadding.left + (w - cellWidth) * .5
-        : widget.cellPadding.left);
-    final cellVerticalPadding = (cellHeight != h
-        ? widget.cellPadding.top + (h - cellHeight) * .5
-        : widget.cellPadding.top);
+    final cellHorizontalPadding = (cellWidth != w ? widget.cellPadding.left + (w - cellWidth) * .5 : widget.cellPadding.left);
+    final cellVerticalPadding = (cellHeight != h ? widget.cellPadding.top + (h - cellHeight) * .5 : widget.cellPadding.top);
 
     final dx = _getWidthToPoint(node.x, node.y, widget.cellPadding);
     final dy = _getHeightToPoint(node.x, node.y, widget.cellPadding);
@@ -200,8 +192,7 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
         height: cellHeight,
         child: GraphiteCell(
             node: node,
-            rect: Rect.fromLTWH(dx + cellHorizontalPadding,
-                dy + cellVerticalPadding, cellWidth, cellHeight),
+            rect: Rect.fromLTWH(dx + cellHorizontalPadding, dy + cellVerticalPadding, cellWidth, cellHeight),
             builder: widget.builder,
             onNodeTapDown: widget.onNodeTapDown,
             onNodeTapUp: widget.onNodeTapUp,
@@ -227,10 +218,10 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
       for (int x = 0; x < widget.matrix.width(); x++) {
         final cell = widget.matrix.getByCoords(x, y);
         if (cell == null) continue;
-        cell.all.forEach((n) {
+        for (var n in cell.all) {
           final node = MatrixNode.fromNodeOutput(x: x, y: y, nodeOutput: n);
           if (!node.isAnchor) items.add(node);
-        });
+        }
       }
     }
     return items;
@@ -240,11 +231,8 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
     return nodes.map((n) => _buildCell(n)).toList();
   }
 
-  List<Widget> _buildOverlay(
-      BuildContext context, List<MatrixNode> nodes, List<Edge> edges) {
-    return widget.overlayBuilder != null
-        ? widget.overlayBuilder!(context, nodes, edges)
-        : [];
+  List<Widget> _buildOverlay(BuildContext context, List<MatrixNode> nodes, List<Edge> edges) {
+    return widget.overlayBuilder != null ? widget.overlayBuilder!(context, nodes, edges) : [];
   }
 
   Widget _drawHorizontalEdgeLabel(BuildContext context, Edge edge) {
@@ -257,12 +245,8 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
 
     return Positioned(
       left: entry[0] - canvasWidth * .5 + width * .5,
-      top: widget.edgeLabels!.alignment == EdgeLabelTextAlignment.after
-          ? entry[1]
-          : null,
-      bottom: widget.edgeLabels!.alignment == EdgeLabelTextAlignment.after
-          ? null
-          : canvasHeight - entry[1],
+      top: widget.edgeLabels!.alignment == EdgeLabelTextAlignment.after ? entry[1] : null,
+      bottom: widget.edgeLabels!.alignment == EdgeLabelTextAlignment.after ? null : canvasHeight - entry[1],
       child: ConstrainedBox(
         constraints: BoxConstraints(
           minWidth: canvasWidth,
@@ -286,12 +270,8 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
 
     return Positioned(
       top: entry[1] - canvasHeight * .5 + height * .5,
-      left: widget.edgeLabels!.alignment == EdgeLabelTextAlignment.after
-          ? entry[0]
-          : null,
-      right: widget.edgeLabels!.alignment == EdgeLabelTextAlignment.after
-          ? null
-          : canvasWidth - entry[0],
+      left: widget.edgeLabels!.alignment == EdgeLabelTextAlignment.after ? entry[0] : null,
+      right: widget.edgeLabels!.alignment == EdgeLabelTextAlignment.after ? null : canvasWidth - entry[0],
       child: ConstrainedBox(
         constraints: BoxConstraints(
           minHeight: canvasHeight,
@@ -308,17 +288,11 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
   Widget _buildEdgeLabel(BuildContext context, Edge edge) {
     switch (widget.edgeLabels!.positionPriority) {
       case EdgeLabelPositionPriority.horizontal:
-        return getHorizontalLine(edge.points).length > 0
-            ? _drawHorizontalEdgeLabel(context, edge)
-            : _drawVerticalEdgeLabel(context, edge);
+        return getHorizontalLine(edge.points).isNotEmpty ? _drawHorizontalEdgeLabel(context, edge) : _drawVerticalEdgeLabel(context, edge);
       case EdgeLabelPositionPriority.vertical:
-        return getVerticalLine(edge.points).length > 0
-            ? _drawVerticalEdgeLabel(context, edge)
-            : _drawHorizontalEdgeLabel(context, edge);
+        return getVerticalLine(edge.points).isNotEmpty ? _drawVerticalEdgeLabel(context, edge) : _drawHorizontalEdgeLabel(context, edge);
       case EdgeLabelPositionPriority.none:
-        return widget.orientation == MatrixOrientation.Horizontal
-            ? _drawHorizontalEdgeLabel(context, edge)
-            : _drawVerticalEdgeLabel(context, edge);
+        return widget.orientation == MatrixOrientation.Horizontal ? _drawHorizontalEdgeLabel(context, edge) : _drawVerticalEdgeLabel(context, edge);
     }
   }
 
@@ -330,99 +304,92 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
 
   List<Edge> _edgesList() {
     final matrixMap = widget.matrix.normalize();
-    List<Edge> _state = [];
+    List<Edge> state = [];
     matrixMap.forEach((key, value) {
       if (value.isAnchor) return;
-      _state.addAll(collectEdges(value, matrixMap));
+      state.addAll(collectEdges(value, matrixMap));
     });
-    return _state;
+    return state;
   }
 
   List<Edge> collectEdges(MatrixNode node, Map<String, MatrixNode> edges) {
-    return node.renderIncomes.map((i) => edges[i]).fold([],
-        (List<Edge> acc, MatrixNode? income) {
+    return node.renderIncomes.map((i) => edges[i]).fold([], (List<Edge> acc, MatrixNode? income) {
       List<List<double>> points = [];
       var incomeNode = edges[income!.id];
       var startNode = node;
       var margins = getEdgeMargins(startNode, incomeNode!);
       var nodeMargin = margins[0];
       var incomeMargin = margins[1];
-      var direction = getVectorDirection(
-          startNode.x, startNode.y, incomeNode.x, incomeNode.y);
+      var direction = getVectorDirection(startNode.x, startNode.y, incomeNode.x, incomeNode.y);
       var directions = pointResolversMap[direction]!;
       var from = directions[0], to = directions[1];
-      final defaultCellSize = NodeSize(
-          width: widget.defaultCellSize.width,
-          height: widget.defaultCellSize.height);
-      List<double> startPoint = getPointWithResolver(
-          from,
-          defaultCellSize,
-          widget.cellPadding,
-          widget.contactEdgesDistance,
-          startNode,
-          nodeMargin,
-          widget.orientation);
+      final defaultCellSize = NodeSize(width: widget.defaultCellSize.width, height: widget.defaultCellSize.height);
+      List<double> startPoint =
+          getPointWithResolver(from, defaultCellSize, widget.cellPadding, widget.contactEdgesDistance, startNode, nodeMargin, widget.orientation);
       points.add(startPoint);
       while (incomeNode!.isAnchor) {
         margins = getEdgeMargins(startNode, incomeNode);
         nodeMargin = margins[0];
         incomeMargin = margins[1];
-        direction = getVectorDirection(
-            startNode.x, startNode.y, incomeNode.x, incomeNode.y);
+        direction = getVectorDirection(startNode.x, startNode.y, incomeNode.x, incomeNode.y);
         directions = pointResolversMap[direction]!;
         from = directions[0];
         to = directions[1];
-        points.add(getPointWithResolver(
-            to,
-            defaultCellSize,
-            widget.cellPadding,
-            widget.contactEdgesDistance,
-            incomeNode,
-            incomeMargin,
-            widget.orientation));
+        points.add(
+            getPointWithResolver(to, defaultCellSize, widget.cellPadding, widget.contactEdgesDistance, incomeNode, incomeMargin, widget.orientation));
         startNode = incomeNode;
         incomeNode = edges[incomeNode.renderIncomes[0]];
       }
       margins = getEdgeMargins(startNode, incomeNode);
       nodeMargin = margins[0];
       incomeMargin = margins[1];
-      direction = getVectorDirection(
-          startNode.x, startNode.y, incomeNode.x, incomeNode.y);
+      direction = getVectorDirection(startNode.x, startNode.y, incomeNode.x, incomeNode.y);
       directions = pointResolversMap[direction]!;
       from = directions[0];
       to = directions[1];
-      points.add(getPointWithResolver(
-          to,
-          defaultCellSize,
-          widget.cellPadding,
-          widget.contactEdgesDistance,
-          incomeNode,
-          incomeMargin,
-          widget.orientation));
-      final edgeInput = incomeNode.next.firstWhere((e) => e.outcome == node.id);
-      acc.add(Edge(points, incomeNode, node, edgeInput.type));
+      points.add(
+        getPointWithResolver(to, defaultCellSize, widget.cellPadding, widget.contactEdgesDistance, incomeNode, incomeMargin, widget.orientation),
+      );
+
+      //original code that limited contacted edges;
+      //final edgeInput = incomeNode.next.firstWhere((e) => e.outcome == node.id);
+      //acc.add(Edge(points, incomeNode, node, edgeInput.type));
+
+      var duplicates = <String, int>{};
+
+      for (var x in incomeNode.next) {
+        duplicates[x.outcome] = !duplicates.containsKey(x.outcome) ? (1) : (duplicates[x.outcome]! + 1);
+      }
+      //get all edges even if cyclic
+      for (var i = 0; i < incomeNode.next.length; i++) {
+        var element = incomeNode.next[i];
+        if (element.outcome != node.id) continue;
+
+        var curveType = EdgeCurveType.straight;
+
+        if (i > 0 && duplicates[element.outcome]! == 1) {
+          curveType = EdgeCurveType.normalCurve;
+        } else if (i > 0 && duplicates[element.outcome]! > 1) {
+          curveType = EdgeCurveType.sameNode;
+        }
+
+        final edgeInput = element;
+        acc.add(Edge(points, incomeNode, node, edgeInput.type, curve: curveType, sameNodePos: i));
+        //}
+      }
+
       return acc;
     });
   }
 
   List<double> getCellCenter(
-      NodeSize defaultCellSize,
-      EdgeInsets padding,
-      double cellX,
-      double cellY,
-      double distance,
-      AnchorMargin margin,
-      MatrixOrientation orientation) {
+      NodeSize defaultCellSize, EdgeInsets padding, double cellX, double cellY, double distance, AnchorMargin margin, MatrixOrientation orientation) {
     double outset = getMargin(margin, distance);
     final cellWidth = _getWidestWidthInAColumn(cellX.floor());
     final cellHeight = _getHighestHeightInARow(cellY.floor());
 
-    double x = _getWidthToPoint(cellX.floor(), cellY.floor(), padding) +
-        cellWidth * .5 +
-        padding.left;
-    double y = _getHeightToPoint(cellX.floor(), cellY.floor(), padding) +
-        cellHeight * .5 +
-        padding.top;
+    double x = _getWidthToPoint(cellX.floor(), cellY.floor(), padding) + cellWidth * .5 + padding.left;
+    double y = _getHeightToPoint(cellX.floor(), cellY.floor(), padding) + cellHeight * .5 + padding.top;
     if (orientation == MatrixOrientation.Horizontal) {
       x += outset;
     } else {
@@ -431,78 +398,52 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
     return [x, y];
   }
 
-  List<double> getCellEntry(
-      MatrixNode node,
-      Direction direction,
-      NodeSize defaultCellSize,
-      EdgeInsets padding,
-      double cellX,
-      double cellY,
-      double distance,
-      AnchorMargin margin,
-      MatrixOrientation orientation) {
+  List<double> getCellEntry(MatrixNode node, Direction direction, NodeSize defaultCellSize, EdgeInsets padding, double cellX, double cellY,
+      double distance, AnchorMargin margin, MatrixOrientation orientation) {
     final w = _getWidestWidthInAColumn(cellX.floor());
     final h = _getHighestHeightInARow(cellY.floor());
     final cw = node.size?.width ?? defaultCellSize.width;
     final ch = node.size?.height ?? defaultCellSize.height;
 
     final actualPadding = getPaddingFromDirection(padding, direction);
-    final cellHorizontalPadding =
-        (cw != w ? actualPadding + (w - cw) * .5 : actualPadding);
-    final cellVerticalPadding =
-        (ch != h ? actualPadding + (h - ch) * .5 : actualPadding);
+    final cellHorizontalPadding = (cw != w ? actualPadding + (w - cw) * .5 : actualPadding);
+    final cellVerticalPadding = (ch != h ? actualPadding + (h - ch) * .5 : actualPadding);
 
     switch (direction) {
       case Direction.top:
-        final x = getCellCenter(defaultCellSize, padding, cellX, cellY,
-            distance, margin, orientation)[0];
-        final y = _getHeightToPoint(cellX.floor(), cellY.floor(), padding) +
-            cellVerticalPadding;
+        final x = getCellCenter(defaultCellSize, padding, cellX, cellY, distance, margin, orientation)[0];
+        final y = _getHeightToPoint(cellX.floor(), cellY.floor(), padding) + cellVerticalPadding;
         return [x, y];
       case Direction.bottom:
-        final x = getCellCenter(defaultCellSize, padding, cellX, cellY,
-            distance, margin, orientation)[0];
-        final y = _getHeightToPoint(cellX.floor(), cellY.floor(), padding) +
-            (ch + cellVerticalPadding);
+        final x = getCellCenter(defaultCellSize, padding, cellX, cellY, distance, margin, orientation)[0];
+        final y = _getHeightToPoint(cellX.floor(), cellY.floor(), padding) + (ch + cellVerticalPadding);
         return [x, y];
       case Direction.right:
-        final y = getCellCenter(defaultCellSize, padding, cellX, cellY,
-            distance, margin, orientation)[1];
-        final x = _getWidthToPoint(cellX.floor(), cellY.floor(), padding) +
-            (cw + cellHorizontalPadding);
+        final y = getCellCenter(defaultCellSize, padding, cellX, cellY, distance, margin, orientation)[1];
+        final x = _getWidthToPoint(cellX.floor(), cellY.floor(), padding) + (cw + cellHorizontalPadding);
         return [x, y];
       case Direction.left:
-        final y = getCellCenter(defaultCellSize, padding, cellX, cellY,
-            distance, margin, orientation)[1];
-        final x = _getWidthToPoint(cellX.floor(), cellY.floor(), padding) +
-            cellHorizontalPadding;
+        final y = getCellCenter(defaultCellSize, padding, cellX, cellY, distance, margin, orientation)[1];
+        final x = _getWidthToPoint(cellX.floor(), cellY.floor(), padding) + cellHorizontalPadding;
         return [x, y];
     }
   }
 
-  List<double> getPointWithResolver(
-      Direction direction,
-      NodeSize defaultCellSize,
-      EdgeInsets padding,
-      double distance,
-      MatrixNode item,
-      AnchorMargin margin,
-      MatrixOrientation orientation) {
+  List<double> getPointWithResolver(Direction direction, NodeSize defaultCellSize, EdgeInsets padding, double distance, MatrixNode item,
+      AnchorMargin margin, MatrixOrientation orientation) {
     if (item.isAnchor) {
-      return getCellCenter(defaultCellSize, padding, item.x.toDouble(),
-          item.y.toDouble(), distance, margin, orientation);
+      return getCellCenter(defaultCellSize, padding, item.x.toDouble(), item.y.toDouble(), distance, margin, orientation);
     } else {
-      return getCellEntry(item, direction, defaultCellSize, padding,
-          item.x.toDouble(), item.y.toDouble(), distance, margin, orientation);
+      return getCellEntry(item, direction, defaultCellSize, padding, item.x.toDouble(), item.y.toDouble(), distance, margin, orientation);
     }
   }
 
   Widget _buildCanvas(BuildContext context, List<Edge> edges, Size size) {
-    return Container(
+    return SizedBox(
       width: size.width,
       height: size.height,
       child: CanvasTouchDetector(
-        gesturesToOverride: [
+        gesturesToOverride: const [
           GestureType.onTapDown,
           GestureType.onTapUp,
           GestureType.onLongPressStart,
@@ -515,31 +456,32 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
           GestureType.onSecondaryTapDown,
           GestureType.onSecondaryTapUp,
         ],
-          builder: (BuildContext ctx) {
-        return CustomPaint(
-          size: Size.infinite,
-          painter: LinesPainter(
-            ctx,
-            edges,
-            tipLength: widget.tipLength,
-            tipAngle: widget.tipAngle,
-            onCanvasTap: widget.onCanvasTap,
-            paintBuilder: widget.paintBuilder,
-            onEdgeTapDown: widget.onEdgeTapDown,
-            onEdgeTapUp: widget.onEdgeTapUp,
-            onEdgeLongPressStart: widget.onEdgeLongPressStart,
-            onEdgeLongPressEnd: widget.onEdgeLongPressEnd,
-            onEdgeLongPressMoveUpdate: widget.onEdgeLongPressMoveUpdate,
-            onEdgeForcePressStart: widget.onEdgeForcePressStart,
-            onEdgeForcePressEnd: widget.onEdgeForcePressEnd,
-            onEdgeForcePressPeak: widget.onEdgeForcePressPeak,
-            onEdgeForcePressUpdate: widget.onEdgeForcePressUpdate,
-            onEdgeSecondaryTapDown: widget.onEdgeSecondaryTapDown,
-            onEdgeSecondaryTapUp: widget.onEdgeSecondaryTapUp,
-            pathBuilder: widget.pathBuilder,
-          ),
-        );
-      })
+        builder: (BuildContext ctx) {
+          return CustomPaint(
+            size: Size.infinite,
+            painter: LinesPainter(
+              ctx,
+              edges,
+              tipLength: widget.tipLength,
+              tipAngle: widget.tipAngle,
+              onCanvasTap: widget.onCanvasTap,
+              paintBuilder: widget.paintBuilder,
+              onEdgeTapDown: widget.onEdgeTapDown,
+              onEdgeTapUp: widget.onEdgeTapUp,
+              onEdgeLongPressStart: widget.onEdgeLongPressStart,
+              onEdgeLongPressEnd: widget.onEdgeLongPressEnd,
+              onEdgeLongPressMoveUpdate: widget.onEdgeLongPressMoveUpdate,
+              onEdgeForcePressStart: widget.onEdgeForcePressStart,
+              onEdgeForcePressEnd: widget.onEdgeForcePressEnd,
+              onEdgeForcePressPeak: widget.onEdgeForcePressPeak,
+              onEdgeForcePressUpdate: widget.onEdgeForcePressUpdate,
+              onEdgeSecondaryTapDown: widget.onEdgeSecondaryTapDown,
+              onEdgeSecondaryTapUp: widget.onEdgeSecondaryTapUp,
+              pathBuilder: widget.pathBuilder,
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -560,8 +502,7 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
   @override
   Widget build(BuildContext context) {
     final size = Size(_getWidthOfCanvas(), _getHeightOfCanvas());
-    return TouchDetectionController(touchController, addStreamListener,
-        child: _buildStack(context, size));
+    return TouchDetectionController(touchController, addStreamListener, child: _buildStack(context, size));
   }
 
   @override

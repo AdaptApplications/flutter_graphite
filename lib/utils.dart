@@ -1,57 +1,38 @@
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
-import 'package:graphite/core/matrix.dart';
-import 'package:graphite/core/typings.dart';
+
+import 'core/matrix.dart';
+import 'core/typings.dart';
 
 double getHighestHeightInARow(Matrix matrix, double defaultCellHeight, int y) {
   return matrix.s[y].fold(
       0,
-      (acc, cell) => max(
-          acc,
-          cell == null
-              ? defaultCellHeight
-              : cell.all.fold(
-                  0,
-                  (prev, node) => node.size == null
-                      ? defaultCellHeight
-                      : node.size!.height)));
+      (acc, cell) =>
+          max(acc, cell == null ? defaultCellHeight : cell.all.fold(0, (prev, node) => node.size == null ? defaultCellHeight : node.size!.height)));
 }
 
 double getWidestWidthInAColumn(Matrix matrix, double defaultCellWidth, int x) {
   double acc = 0;
   for (var y = 0; y < matrix.height(); y++) {
     final cell = matrix.getByCoords(x, y);
-    acc = max(
-        acc,
-        cell == null
-            ? defaultCellWidth
-            : cell.all.fold(
-                0,
-                (prev, node) =>
-                    node.size == null ? defaultCellWidth : node.size!.width));
+    acc = max(acc, cell == null ? defaultCellWidth : cell.all.fold(0, (prev, node) => node.size == null ? defaultCellWidth : node.size!.width));
   }
   return acc;
 }
 
-double getWidthOfCanvas(
-    Matrix matrix, double defaultCellWidth, EdgeInsets cellPadding) {
+double getWidthOfCanvas(Matrix matrix, double defaultCellWidth, EdgeInsets cellPadding) {
   double width = 0.0;
   for (int x = 0; x < matrix.width(); x++) {
-    width += (getWidestWidthInAColumn(matrix, defaultCellWidth, x) +
-        cellPadding.left +
-        cellPadding.right);
+    width += (getWidestWidthInAColumn(matrix, defaultCellWidth, x) + cellPadding.left + cellPadding.right);
   }
   return width;
 }
 
-double getHeightOfCanvas(
-    Matrix matrix, double defaultCellHeight, EdgeInsets cellPadding) {
+double getHeightOfCanvas(Matrix matrix, double defaultCellHeight, EdgeInsets cellPadding) {
   double height = 0.0;
   for (int y = 0; y < matrix.height(); y++) {
-    height += (getHighestHeightInARow(matrix, defaultCellHeight, y) +
-        cellPadding.top +
-        cellPadding.bottom);
+    height += (getHighestHeightInARow(matrix, defaultCellHeight, y) + cellPadding.top + cellPadding.bottom);
   }
   return height;
 }
@@ -84,17 +65,12 @@ List<AnchorMargin> getEdgeMargins(MatrixNode node, MatrixNode income) {
   }
 }
 
-List<double> applyMargin(AnchorMargin margin, List<double> point,
-    double distance, MatrixOrientation orientation) {
+List<double> applyMargin(AnchorMargin margin, List<double> point, double distance, MatrixOrientation orientation) {
   if (margin == AnchorMargin.none) return point;
-  if (orientation == MatrixOrientation.Horizontal &&
-      margin == AnchorMargin.start) return [point[0] - distance, point[1]];
-  if (orientation == MatrixOrientation.Vertical && margin == AnchorMargin.start)
-    return [point[0], point[1] - distance];
-  if (orientation == MatrixOrientation.Horizontal && margin == AnchorMargin.end)
-    return [point[0] + distance, point[1]];
-  if (orientation == MatrixOrientation.Vertical && margin == AnchorMargin.end)
-    return [point[0], point[1] + distance];
+  if (orientation == MatrixOrientation.Horizontal && margin == AnchorMargin.start) return [point[0] - distance, point[1]];
+  if (orientation == MatrixOrientation.Vertical && margin == AnchorMargin.start) return [point[0], point[1] - distance];
+  if (orientation == MatrixOrientation.Horizontal && margin == AnchorMargin.end) return [point[0] + distance, point[1]];
+  if (orientation == MatrixOrientation.Vertical && margin == AnchorMargin.end) return [point[0], point[1] + distance];
   return point;
 }
 

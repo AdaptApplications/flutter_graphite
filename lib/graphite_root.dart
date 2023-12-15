@@ -1,8 +1,9 @@
 import 'package:flutter/widgets.dart';
-import 'package:graphite/core/matrix.dart';
-import 'package:graphite/core/typings.dart';
-import 'package:graphite/graphite_canvas.dart';
-import 'package:graphite/graphite_typings.dart';
+
+import 'core/matrix.dart';
+import 'core/typings.dart';
+import 'graphite_canvas.dart';
+import 'graphite_typings.dart';
 
 class GraphiteRoot extends StatefulWidget {
   final Matrix mtx;
@@ -70,7 +71,8 @@ class GraphiteRoot extends StatefulWidget {
 
   final GestureEdgeTapUpCallback? onEdgeSecondaryTapUp;
 
-  GraphiteRoot({
+  const GraphiteRoot({
+    super.key,
     required this.mtx,
     required this.defaultCellSize,
     required this.cellPadding,

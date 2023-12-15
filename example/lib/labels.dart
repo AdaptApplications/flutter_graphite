@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:graphite/core/typings.dart';
 import 'package:graphite/graphite.dart';
+import 'package:graphite/graphite_typings.dart';
 
 const presetBasic = '['
     '{"id":"A","next":[{"outcome":"B","type":"one"}],"size":{"width": 75.0, "height": 75.0}},'
@@ -36,9 +38,7 @@ class LabelsPageState extends State<LabelsPage> {
   Widget build(BuildContext context) {
     var list = nodeInputFromJson(presetBasic);
     return Scaffold(
-      appBar: AppBar(
-          leading: const Icon(Icons.view_module),
-          title: const Text('Edge Labels Example')),
+      appBar: AppBar(leading: const Icon(Icons.view_module), title: const Text('Edge Labels Example')),
       body: Stack(
         children: [
           InteractiveViewer(
@@ -46,13 +46,10 @@ class LabelsPageState extends State<LabelsPage> {
             child: DirectGraph(
               list: list,
               defaultCellSize: const Size(100.0, 100.0),
-              cellPadding: _isVertical
-                  ? const EdgeInsets.symmetric(vertical: 30, horizontal: 5)
-                  : const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+              cellPadding:
+                  _isVertical ? const EdgeInsets.symmetric(vertical: 30, horizontal: 5) : const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
               contactEdgesDistance: 10.0,
-              orientation: _isVertical
-                  ? MatrixOrientation.Vertical
-                  : MatrixOrientation.Horizontal,
+              orientation: _isVertical ? MatrixOrientation.Vertical : MatrixOrientation.Horizontal,
               edgeLabels: EdgeLabels(
                   alignment: EdgeLabelTextAlignment.before,
                   positionPriority: EdgeLabelPositionPriority.horizontal,
@@ -62,20 +59,10 @@ class LabelsPageState extends State<LabelsPage> {
                             ? RotatedBox(
                                 quarterTurns: -1,
                                 child: Text(
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyText2!
-                                        .copyWith(
-                                            backgroundColor: Theme.of(context)
-                                                .backgroundColor),
+                                    style: Theme.of(context).textTheme.bodyText2!.copyWith(backgroundColor: Theme.of(context).backgroundColor),
                                     "${edge.from.id}=>${edge.to.id}"))
                             : Text(
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText2!
-                                    .copyWith(
-                                        backgroundColor:
-                                            Theme.of(context).backgroundColor),
+                                style: Theme.of(context).textTheme.bodyText2!.copyWith(backgroundColor: Theme.of(context).backgroundColor),
                                 "${edge.from.id}=>${edge.to.id}"),
                       )),
               centered: _isCentered,

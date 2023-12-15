@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:graphite/core/graph_basic.dart';
-import 'package:graphite/core/matrix.dart';
-import 'package:graphite/core/traverse_queue.dart';
-import 'package:graphite/core/typings.dart';
+import 'graph_basic.dart';
+import 'matrix.dart';
+import 'traverse_queue.dart';
+import 'typings.dart';
 
 class State {
   final Matrix mtx;
@@ -25,8 +25,7 @@ class HorizontalCollisionCheck {
 }
 
 class GraphMatrix extends GraphBasic {
-  GraphMatrix({required List<NodeInput> list, required bool centred})
-      : super(list: list, centred: centred);
+  GraphMatrix({required super.list, required super.centred});
 
   bool joinHasUnresolvedIncomes(NodeOutput item) {
     return item.passedIncomes.length != incomes(item.id).length;
@@ -35,19 +34,17 @@ class GraphMatrix extends GraphBasic {
   void insertNodeOnMatrix(NodeOutput item, State state, bool checkCollision) {
     var mtx = state.mtx;
     // check occupied here
-    if (checkCollision &&
-        (mtx.hasHorizontalCollision(state.x, state.y) ||
-            mtx.cellBusyForItem(item, state.x, state.y))) {
+    if (checkCollision && (mtx.hasHorizontalCollision(state.x, state.y) || mtx.cellBusyForItem(item, state.x, state.y))) {
       mtx.insertRowBefore(state.y);
     }
     mtx.insert(state.x, state.y, item);
-    this.markIncomesAsPassed(mtx, item);
+    markIncomesAsPassed(mtx, item);
     return;
   }
 
   int getCenterYAmongIncomes(NodeOutput item, Matrix mtx) {
     final incomes = item.passedIncomes.map((e) => e).toList();
-    if (incomes.length == 0) {
+    if (incomes.isEmpty) {
       return 0;
     }
     incomes.sort((keyA, keyB) {
@@ -57,10 +54,8 @@ class GraphMatrix extends GraphBasic {
       List<int>? coordsB = mtx.find((NodeOutput itm) {
         return itm.id == keyB;
       });
-      if (coordsA?.length != 2)
-        throw "cannot find coordinates for passed income: $keyA";
-      if (coordsB?.length != 2)
-        throw "cannot find coordinates for passed income: $keyB";
+      if (coordsA?.length != 2) throw "cannot find coordinates for passed income: $keyA";
+      if (coordsB?.length != 2) throw "cannot find coordinates for passed income: $keyB";
 
       return coordsA![1] > coordsB![1] ? 1 : -1;
     });
@@ -69,22 +64,20 @@ class GraphMatrix extends GraphBasic {
     List<int>? coords = mtx.find((NodeOutput itm) {
       return itm.id == centerKey;
     });
-    if (coords?.length != 2)
-      throw "cannot find coordinates for passed center income: $centerKey";
+    if (coords?.length != 2) throw "cannot find coordinates for passed center income: $centerKey";
     return coords![1];
   }
 
   int getLowestYAmongIncomes(NodeOutput item, Matrix mtx) {
     final incomes = item.passedIncomes;
-    if (incomes.length == 0) {
+    if (incomes.isEmpty) {
       return 0;
     }
     return incomes.map((String id) {
       List<int>? coords = mtx.find((NodeOutput itm) {
         return itm.id == id;
       });
-      if (coords?.length != 2)
-        throw "cannot find coordinates for passed income: $id";
+      if (coords?.length != 2) throw "cannot find coordinates for passed income: $id";
       return coords![1];
     }).reduce(min);
   }
@@ -92,26 +85,23 @@ class GraphMatrix extends GraphBasic {
   bool processOrSkipNodeOnMatrix(NodeOutput item, State state) {
     var mtx = state.mtx;
     var queue = state.queue;
-    if (item.passedIncomes.length != 0) {
-      state.y = centred
-          ? this.getCenterYAmongIncomes(item, mtx)
-          : this.getLowestYAmongIncomes(item, mtx);
+    if (item.passedIncomes.isNotEmpty) {
+      state.y = centred ? getCenterYAmongIncomes(item, mtx) : getLowestYAmongIncomes(item, mtx);
     }
     bool hasLoops = this.hasLoops(item);
     List<LoopNode> loopNodes = [];
     if (hasLoops) {
-      loopNodes = this.handleLoopEdges(item, state);
+      loopNodes = handleLoopEdges(item, state);
     }
-    bool needsLoopSkip = hasLoops && loopNodes.length == 0;
+    bool needsLoopSkip = hasLoops && loopNodes.isEmpty;
     if (mtx.hasVerticalCollision(state.x, state.y) || needsLoopSkip) {
       queue.push(item);
       return false;
     }
-    this.insertNodeOnMatrix(item, state, false);
+    insertNodeOnMatrix(item, state, false);
 
-    if (loopNodes.length != 0) {
-      loopNodes
-          .sort((a, b) => a.isSelfLoop ? -1 : 1); // process self-loop first
+    if (loopNodes.isNotEmpty) {
+      loopNodes.sort((a, b) => a.isSelfLoop ? -1 : 1); // process self-loop first
       insertLoopEdges(item, state, loopNodes);
     }
     return true;
@@ -120,27 +110,20 @@ class GraphMatrix extends GraphBasic {
   List<LoopNode> handleLoopEdges(NodeOutput item, State state) {
     var mtx = state.mtx;
     var loops = this.loops(item.id);
-    if (loops.length == 0) throw "no loops found for node ${item.id}";
+    if (loops.isEmpty) throw "no loops found for node ${item.id}";
     List<LoopNode> loopNodes = loops.map((String incomeId) {
       if (item.id == incomeId) {
-        return LoopNode(
-            id: incomeId, node: item, x: state.x, y: state.y, isSelfLoop: true);
+        return LoopNode(id: incomeId, node: item, x: state.x, y: state.y, isSelfLoop: true);
       }
       List<int>? coords = mtx.find((NodeOutput n) {
         return n.id == incomeId;
       });
-      if (coords?.length != 2)
-        throw "loop target $incomeId not found on matrix";
+      if (coords?.length != 2) throw "loop target $incomeId not found on matrix";
       MatrixCell? cell = mtx.getByCoords(coords![0], coords[1]);
       if (cell == null) throw "loop target cell $incomeId not found on matrix";
       NodeOutput? node = cell.getById(incomeId);
       if (node == null) throw "loop target node $incomeId not found on matrix";
-      return LoopNode(
-          id: incomeId,
-          node: node,
-          x: coords[0],
-          y: coords[1],
-          isSelfLoop: false);
+      return LoopNode(id: incomeId, node: node, x: coords[0], y: coords[1], isSelfLoop: false);
     }).toList();
     bool skip = loopNodes.any((LoopNode income) {
       int checkY = income.y != 0 ? income.y - 1 : 0;
@@ -150,12 +133,12 @@ class GraphMatrix extends GraphBasic {
   }
 
   bool hasLoops(NodeOutput item) {
-    return loops(item.id).length != 0;
+    return loops(item.id).isNotEmpty;
   }
 
   void insertLoopEdges(NodeOutput item, State state, List<LoopNode> loopNodes) {
     var mtx = state.mtx, initialX = state.x, initialY = state.y;
-    loopNodes.forEach((LoopNode income) {
+    for (var income in loopNodes) {
       var id = income.id, node = income.node, renderIncomeId = item.id;
       if (income.isSelfLoop) {
         state.x = initialX + 1;
@@ -184,8 +167,7 @@ class GraphMatrix extends GraphBasic {
       String fromId = "$id-${item.id}-from";
       String toId = "$id-${item.id}-to";
       node.renderIncomes.add(fromId);
-      if (state.y == 0 ||
-          mtx.hasLoopAnchorCollision(state.x, state.y - 1, income.x, toId)) {
+      if (state.y == 0 || mtx.hasLoopAnchorCollision(state.x, state.y - 1, income.x, toId)) {
         mtx.insertRowBefore(state.y);
       } else {
         state.y--;
@@ -229,15 +211,14 @@ class GraphMatrix extends GraphBasic {
         false,
       );
       state.x = initialX;
-    });
+    }
     state.y = initialY;
     return;
   }
 
-  void insertSplitOutcomes(
-      NodeOutput item, State state, TraverseQueue levelQueue) {
+  void insertSplitOutcomes(NodeOutput item, State state, TraverseQueue levelQueue) {
     var queue = state.queue, outcomes = this.outcomes(item.id);
-    if (outcomes.length == 0) throw "split ${item.id} has no outcomes";
+    if (outcomes.isEmpty) throw "split ${item.id} has no outcomes";
     outcomes = List.from(outcomes);
     if (centred) {
       int initialY = state.y;
@@ -246,8 +227,7 @@ class GraphMatrix extends GraphBasic {
 
       while (half != 0) {
         half--;
-        if (state.y == 0 ||
-            state.mtx.hasHorizontalCollision(state.x, state.y - 1)) {
+        if (state.y == 0 || state.mtx.hasHorizontalCollision(state.x, state.y - 1)) {
           state.mtx.insertRowBefore(state.y);
           initialY++;
         } else {
@@ -256,7 +236,7 @@ class GraphMatrix extends GraphBasic {
 
         topOutcomes.add(outcomes.removeAt(0));
       }
-      topOutcomes.forEach((String outcomeId) {
+      for (var outcomeId in topOutcomes) {
         String id = "${item.id}-$outcomeId";
         insertNodeOnMatrix(
           NodeOutput(
@@ -275,14 +255,14 @@ class GraphMatrix extends GraphBasic {
           state,
           true,
         );
-        NodeInput v = this.node(outcomeId);
+        NodeInput v = node(outcomeId);
         queue.add(incomeId: id, bufferQueue: levelQueue, items: [v]);
         state.y++;
-      });
+      }
       state.y = initialY;
     }
     String directOutcomeId = outcomes.removeAt(0);
-    NodeInput direct = this.node(directOutcomeId);
+    NodeInput direct = node(directOutcomeId);
     queue.add(incomeId: item.id, bufferQueue: levelQueue, items: [
       NodeInput(
         id: direct.id,
@@ -290,7 +270,7 @@ class GraphMatrix extends GraphBasic {
         size: direct.size,
       )
     ]);
-    outcomes.forEach((String outcomeId) {
+    for (var outcomeId in outcomes) {
       state.y++;
       String id = "${item.id}-$outcomeId";
       insertNodeOnMatrix(
@@ -310,18 +290,15 @@ class GraphMatrix extends GraphBasic {
         state,
         true,
       );
-      NodeInput v = this.node(outcomeId);
+      NodeInput v = node(outcomeId);
       queue.add(incomeId: id, bufferQueue: levelQueue, items: [v]);
-    });
+    }
   }
 
-  void insertJoinIncomes(NodeOutput item, State state, TraverseQueue levelQueue,
-      bool addItemToQueue) {
+  void insertJoinIncomes(NodeOutput item, State state, TraverseQueue levelQueue, bool addItemToQueue) {
     final mtx = state.mtx, queue = state.queue, incomes = item.passedIncomes;
-    final directY = centred
-        ? this.getCenterYAmongIncomes(item, mtx)
-        : this.getLowestYAmongIncomes(item, mtx);
-    incomes.forEach((String incomeId) {
+    final directY = centred ? getCenterYAmongIncomes(item, mtx) : getLowestYAmongIncomes(item, mtx);
+    for (var incomeId in incomes) {
       final found = mtx.findNode((NodeOutput n) {
         return n.id == incomeId;
       });
@@ -329,9 +306,8 @@ class GraphMatrix extends GraphBasic {
       final y = found.coords[1], income = found.item;
       if (directY == y) {
         item.renderIncomes.add(incomeId);
-        income.childrenOnMatrix =
-            min((income.childrenOnMatrix ?? 0) + 1, income.next.length);
-        return;
+        income.childrenOnMatrix = min((income.childrenOnMatrix ?? 0) + 1, income.next.length);
+        continue;
       }
       state.y = y;
       String id = "$incomeId-${item.id}";
@@ -342,9 +318,7 @@ class GraphMatrix extends GraphBasic {
           next: [EdgeInput(outcome: item.id)],
           anchorType: AnchorType.join,
           anchorMargin: AnchorMargin.start,
-          orientation: y > directY
-              ? AnchorOrientation.bottomRight
-              : AnchorOrientation.topRight,
+          orientation: y > directY ? AnchorOrientation.bottomRight : AnchorOrientation.topRight,
           from: incomeId,
           to: item.id,
           isAnchor: true,
@@ -355,27 +329,23 @@ class GraphMatrix extends GraphBasic {
         state,
         false,
       );
-    });
+    }
     if (addItemToQueue) {
-      queue.add(
-          incomeId: item.id,
-          bufferQueue: levelQueue,
-          items: getOutcomesArray(item.id));
+      queue.add(incomeId: item.id, bufferQueue: levelQueue, items: getOutcomesArray(item.id));
     }
     return;
   }
 
   void markIncomesAsPassed(Matrix mtx, NodeOutput item) {
-    item.renderIncomes.forEach((String incomeId) {
+    for (var incomeId in item.renderIncomes) {
       var found = mtx.findNode((NodeOutput n) {
         return n.id == incomeId;
       });
       if (found == null) throw "income $incomeId not found on matrix";
       var coords = found.coords, income = found.item;
-      income.childrenOnMatrix =
-          min((income.childrenOnMatrix ?? 0) + 1, income.next.length);
+      income.childrenOnMatrix = min((income.childrenOnMatrix ?? 0) + 1, income.next.length);
       mtx.insert(coords[0], coords[1], income);
-    });
+    }
     return;
   }
 
