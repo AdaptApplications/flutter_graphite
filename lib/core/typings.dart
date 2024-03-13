@@ -259,6 +259,7 @@ class Edge {
   final EdgeArrowType arrowType;
   final EdgeCurveType curve;
   final int sameNodePos;
+  final Object? additionalData;
 
-  Edge(this.points, this.from, this.to, this.arrowType, {this.curve = EdgeCurveType.straight, this.sameNodePos = 0});
+  Edge(this.points, this.from, this.to, this.arrowType, {this.curve = EdgeCurveType.straight, this.sameNodePos = 0, this.additionalData});
 }
