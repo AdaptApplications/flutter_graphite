@@ -46,6 +46,7 @@ class EdgeInput {
   EdgeInput({
     required this.outcome,
     this.type = EdgeArrowType.one,
+    this.additionalData,
   });
 
   /// [outcome] *unique* identifier of the outcome node. Outcome node should exist
@@ -58,9 +59,16 @@ class EdgeInput {
   /// [EdgeArrowType.both] draw arrows on both sides of the edge.
   final EdgeArrowType type;
 
+  final Object? additionalData;
+
   factory EdgeInput.fromJson(Map<String, dynamic> json) => EdgeInput(
         outcome: json["outcome"],
-        type: json["type"] == null ? EdgeArrowType.one : EdgeInput.typeFromString(json["type"]),
+        type: json["type"] == null
+            ? EdgeArrowType.one
+            : EdgeInput.typeFromString(
+                json["type"],
+              ),
+        additionalData: json["additionalData"],
       );
 
   static EdgeArrowType typeFromString(String typeAsString) {
