@@ -374,7 +374,16 @@ class _GraphiteCanvasState extends State<GraphiteCanvas> {
         }
 
         final edgeInput = element;
-        acc.add(Edge(points, incomeNode, node, edgeInput.type, curve: curveType, sameNodePos: i, additionalData: edgeInput.additionalData));
+        acc.add(Edge(
+          points,
+          incomeNode,
+          node,
+          edgeInput.type,
+          curve: curveType,
+          sameNodePos: i,
+          additionalData: edgeInput.additionalData,
+          dashline: edgeInput.dashedLine,
+        ));
         //}
       }
 

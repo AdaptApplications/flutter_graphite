@@ -4,6 +4,7 @@ import 'package:touchable/touchable.dart';
 
 import 'core/typings.dart';
 import 'graphite_typings.dart';
+import 'dart:math';
 
 Paint _defaultPaintBuilder(Edge edge) {
   return Paint()
@@ -67,12 +68,26 @@ class LinesPainter extends CustomPainter {
     return points;
   }
 
-  Path _defaultEdgePathBuilder(NodeInput from, NodeInput to, List<List<double>> points, Edge edge) {
+  Path _defaultEdgePathBuilder(Canvas c, Paint p, NodeInput from, NodeInput to, List<List<double>> points, Edge edge) {
     var path = Path();
-    path.moveTo(points[0][0], points[0][1]);
-    for (var point in points) {
-      path.lineTo(point[0], point[1]);
+    if (edge.dashline) {
+      Offset startPoint = Offset(points[0][0], points[0][1]);
+
+      for (var point in points) {
+        Offset NextPoint = Offset(point[0], point[1]);
+        drawDashedLine(canvas: c, p1: startPoint, p2: NextPoint, dashWidth: 5, dashSpace: 5, paint: p);
+        startPoint = NextPoint;
+      }
+      //set last point
+      path.moveTo(points[points.length - 1][0] - 5, points[points.length - 1][1]);
+      path.lineTo(points[points.length - 1][0], points[points.length - 1][1]);
+    } else {
+      path.moveTo(points[0][0], points[0][1]);
+      for (var point in points) {
+        path.lineTo(point[0], point[1]);
+      }
     }
+
     if (edge.arrowType == EdgeArrowType.none) {
       return path;
     }
@@ -107,18 +122,19 @@ class LinesPainter extends CustomPainter {
     var background = Paint()
       ..color = Colors.transparent
       ..style = PaintingStyle.fill;
-    canvas.drawRect(Rect.fromPoints(const Offset(0, 0), Offset(size.width, size.height)), background, onTapDown: onCanvasTap);
+
+    //canvas.drawRect(Rect.fromPoints(const Offset(0, 0), Offset(size.width, size.height)), background, onTapDown: onCanvasTap);
     List<Edge> nodeEdges = edges;
 
     for (var e in nodeEdges) {
       Path path = Path();
+      final paint = _defaultPaintBuilder(e);
 
       switch (e.curve) {
         default:
-          path = _defaultEdgePathBuilder(e.from.toInput(), e.to.toInput(), _offsetPoints(e), e);
+          path = _defaultEdgePathBuilder(c, paint, e.from.toInput(), e.to.toInput(), _offsetPoints(e), e);
       }
 
-      final paint = _defaultPaintBuilder(e);
       c.drawPath(
         path,
         paint,
@@ -126,6 +142,38 @@ class LinesPainter extends CustomPainter {
 
       // add transparent wider lines on top to track gestures
       _handleTransparentLineForTaps(e, canvas, _offsetPoints(e), paint.strokeWidth * 5);
+    }
+  }
+
+  void drawDashedLine({
+    required Canvas canvas,
+    required Offset p1,
+    required Offset p2,
+    required int dashWidth,
+    required int dashSpace,
+    required Paint paint,
+  }) {
+    // Get normalized distance vector from p1 to p2
+    var dx = p2.dx - p1.dx;
+    var dy = p2.dy - p1.dy;
+    final magnitude = sqrt(dx * dx + dy * dy);
+    dx = dx / magnitude;
+    dy = dy / magnitude;
+
+    // Compute number of dash segments
+    final steps = magnitude ~/ (dashWidth + dashSpace);
+
+    var startX = p1.dx;
+    var startY = p1.dy;
+
+    for (int i = 0; i < steps; i++) {
+      final endX = startX + dx * dashWidth;
+      final endY = startY + dy * dashWidth;
+      canvas.drawLine(Offset(startX, startY), Offset(endX, endY), paint);
+      var path = Path();
+
+      startX += dx * (dashWidth + dashSpace);
+      startY += dy * (dashWidth + dashSpace);
     }
   }
 

@@ -47,6 +47,7 @@ class EdgeInput {
     required this.outcome,
     this.type = EdgeArrowType.one,
     this.additionalData,
+    this.dashedLine = false,
   });
 
   /// [outcome] *unique* identifier of the outcome node. Outcome node should exist
@@ -60,6 +61,8 @@ class EdgeInput {
   final EdgeArrowType type;
 
   final Object? additionalData;
+
+  final bool dashedLine;
 
   factory EdgeInput.fromJson(Map<String, dynamic> json) => EdgeInput(
         outcome: json["outcome"],
@@ -267,7 +270,17 @@ class Edge {
   final EdgeArrowType arrowType;
   final EdgeCurveType curve;
   final int sameNodePos;
+  final bool dashline;
   final Object? additionalData;
 
-  Edge(this.points, this.from, this.to, this.arrowType, {this.curve = EdgeCurveType.straight, this.sameNodePos = 0, this.additionalData});
+  Edge(
+    this.points,
+    this.from,
+    this.to,
+    this.arrowType, {
+    this.curve = EdgeCurveType.straight,
+    this.sameNodePos = 0,
+    this.additionalData,
+    this.dashline = false,
+  });
 }
